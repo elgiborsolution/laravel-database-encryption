@@ -1,0 +1,34 @@
+{
+  "name": "elgibor-solution/laravel-database-encryption",
+  "description": "Auto Encrypt and Decrypt Database through Eloquent",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "E-Solution",
+      "email": "info@elgibor-solution.com"
+    }
+  ],
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "ESolution\\DBEncryption\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+        "ESolution\\DBEncryption\\Tests\\": "tests"
+    }
+  },
+  "require-dev": {
+    "orchestra/testbench": "^6.0",
+    "phpunit/phpunit": "^9.4"
+  },
+  "extra": {
+    "laravel": {
+        "providers": [
+            "ESolution\\DBEncryption\\Providers\\DBEncryptionServiceProvider"
+        ]
+    }
+  }
+}
