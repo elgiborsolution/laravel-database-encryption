@@ -130,7 +130,7 @@ $user = User::whereEncrypted('email','test@gmail.com')->filter(function ($item) 
 This package was inspired from the following:
  [austinheap/laravel-database-encryption](https://github.com/austinheap/laravel-database-encryption)
  [magros/laravel-model-encryption](https://github.com/magros/laravel-model-encryption)
- [DustApplication/laravel-database-model-encryption] (https://github.com/DustApplication/laravel-database-model-encryption.git)
+ [DustApplication/laravel-database-model-encryption](https://github.com/DustApplication/laravel-database-model-encryption.git)
  
 ## License
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
