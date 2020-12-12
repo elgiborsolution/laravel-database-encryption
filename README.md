@@ -1,5 +1,7 @@
 # Laravel Database Encryption Package
 
+[![Build Status](https://travis-ci.com/elgibor-solution/laravel-database-encryption.svg?branch=main)](https://travis-ci.com/elgibor-solution/laravel-database-encryption)
+
 ## Package for encrypting and decrypting model attributes for Laravel using Laravel's Crypt
 
 ## Key Features
