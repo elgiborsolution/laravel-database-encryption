@@ -8,7 +8,9 @@ namespace ESolution\DBEncryption\Providers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Crypt;
+
+use ESolution\DBEncryption\Console\Commands\EncryptModel;
+use ESolution\DBEncryption\Console\Commands\DecryptModel;
 
 class DBEncryptionServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,13 @@ class DBEncryptionServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->bootValidators();
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                EncryptModel::class,
+                DecryptModel::class
+            ]);
+        }
     }
 
     /**
@@ -41,58 +50,34 @@ class DBEncryptionServiceProvider extends ServiceProvider
     {
 
         Validator::extend('unique_encrypted', function ($attribute, $value, $parameters, $validator) {
-            /* Parameters 
-               parameters[0] = table,
-               parameters[1] = field,
-               parameters[2] = additional_field_filter/ignore_id, 
-               parameters[3] = additional_field_filtervalue,
-               parameters[4] = ignore_id 
-            */
+
             // Initialize
+            $salt = substr(hash('sha256', env('APP_KEY')), 0, 16);
+
             $withFilter = count($parameters) > 3 ? true : false;
 
             $ignore_id = isset($parameters[2]) ? $parameters[2] : '';
 
             // Check using normal checker
-            $data = DB::table($parameters[0])->where($parameters[1],$value);
+            $data = DB::table($parameters[0])->whereRaw("CONVERT(AES_DECRYPT(FROM_bASE64(`{$parameters[1]}`), '{$salt}') USING utf8mb4) = '{$value}' ");
             $data = $ignore_id != '' ? $data->where('id','!=',$ignore_id) : $data;
-            if($withFilter){
-                $data->where($parameters[3],$parameters[4]);
-            }
-            if($data->get()->first()){
-                return false;
-            }else{
-                // Check if existing on encrypted fields if result is false
-                $data = DB::table($parameters[0])->get()->filter(function ($item) use ($value, $parameters, $ignore_id, $withFilter) {
-                    $itemValue = isset($item->{$parameters[1]}) ? $item->{$parameters[1]} : '';
-                    try {
-                        $itemValue = Crypt::decrypt($itemValue);
-                    } catch (\Exception $e) {}
 
-                    if($withFilter){
-                        return strtolower($itemValue) == strtolower($value) && $item->{$parameters[3]} == $parameters[4] && ($ignore_id != '' ? $item->id != $ignore_id : true) == true;
-                    }else{
-                        return strtolower($itemValue) == strtolower($value) && ($ignore_id != '' ? $item->id != $ignore_id : true) == true;
-                    }
-                });
-                if($data->first()){
-                    return false;
-                }
+            if ($withFilter) {
+                $data->where($parameters[3], $parameters[4]);
+            }
+
+            if($data->first()){
+                return false;
             }
 
             return true;
         });
 
         Validator::extend('exists_encrypted', function ($attribute, $value, $parameters, $validator) {
-            /* Parameters 
-               parameters[0] = table,
-               parameters[1] = field,
-               parameters[2] = additional_field_filter/ignore_id, 
-               parameters[3] = additional_field_filtervalue,
-               parameters[4] = ignore_id 
-            */
 
             // Initialize
+            $salt = substr(hash('sha256', env('APP_KEY')), 0, 16);
+
             $withFilter = count($parameters) > 3 ? true : false;
             if(!$withFilter){
                 $ignore_id = isset($parameters[2]) ? $parameters[2] : '';
@@ -101,31 +86,15 @@ class DBEncryptionServiceProvider extends ServiceProvider
             }
             
             // Check using normal checker
-            $data = DB::table($parameters[0])->where($parameters[1],$value);
+            $data = DB::table($parameters[0])->whereRaw("CONVERT(AES_DECRYPT(FROM_bASE64(`{$parameters[1]}`), '{$salt}') USING utf8mb4) = '{$value}' ");
             $data = $ignore_id != '' ? $data->where('id','!=',$ignore_id) : $data;
 
-            if($withFilter){
-                $data->where($parameters[2],$parameters[3]);
+            if ($withFilter) {
+                $data->where($parameters[2], $parameters[3]);
             }
-            if($data->first()){
-                return true;
-            }else{
-                // Check if existing on encrypted fields
-                $data = DB::table($parameters[0])->get()->filter(function ($item) use ($value, $parameters, $ignore_id, $withFilter) {
-                            $itemValue = isset($item->{$parameters[1]}) ? $item->{$parameters[1]} : '';
-                            try {
-                                $itemValue = Crypt::decrypt($itemValue);
-                            } catch (\Exception $e) {}
 
-                            if($withFilter){
-                                return strtolower($itemValue) == strtolower($value) && $item->{$parameters[2]} == $parameters[3] && ($ignore_id != '' ? $item->id != $ignore_id : true) == true;
-                            }else{
-                                return strtolower($itemValue) == strtolower($value) && ($ignore_id != '' ? $item->id != $ignore_id : true) == true;
-                            }
-                        });
-                if($data->first()){
-                   return true;
-                }
+            if ($data->first()) {
+                return true;
             }
             
             return false;

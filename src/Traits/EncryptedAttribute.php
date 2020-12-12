@@ -11,18 +11,6 @@ use ESolution\DBEncryption\Encrypter;
 trait EncryptedAttribute {
 
     public static $enableEncryption = true;
-    private $encrypter;
-
-    /**
-     * @return Encrypter
-     */
-    public function encrypter()
-    {
-        if(! $this->encrypter){
-            $this->encrypter = new Encrypter();
-        }
-        return $this->encrypter;
-    }
 
      /**
      * @param $key

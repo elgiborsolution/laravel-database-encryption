@@ -17,7 +17,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-        "ESolution\\DBEncryption\\Tests\\": "tests"
+        "ESolution\\DBEncryption\\Tests\\": "tests",
+        "ESolution\\DBEncryption\\Tests\\Database\\Factories\\": "tests/database/factories"
     }
   },
   "require-dev": {
@@ -30,5 +31,9 @@
             "ESolution\\DBEncryption\\Providers\\DBEncryptionServiceProvider"
         ]
     }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "test-f": "vendor/bin/phpunit --filter"
   }
 }

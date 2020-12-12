@@ -17,7 +17,7 @@ class EncryptionEloquentBuilder extends Builder
           
       $salt = substr(hash('sha256', env('APP_KEY')), 0, 16);
 
-      return self::whereRaw("CONVERT(AES_DECRYPT(FROM_bASE64(`{$filter->field}`), '{$salt}') USING utf8mb4_unicode_ci) {$filter->operation} '{$filter->value}' ");
+      return self::whereRaw("CONVERT(AES_DECRYPT(FROM_bASE64(`{$filter->field}`), '{$salt}') USING utf8mb4) {$filter->operation} '{$filter->value}' ");
     }
 
     public function orWhereEncrypted($param1, $param2, $param3 = null)
