@@ -1,1 +1,8 @@
+.idea
 vendor
+.DS_Store
+tests/database/factories/.DS_Store
+src/Console/.DS_Store
+src/Console/Commands/.DS_Store
+src/Traits/.DS_Store
+src/Providers/.DS_Store
