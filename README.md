@@ -15,7 +15,7 @@
 * Minimal configuration
 * Include searching encrypted data using the following:
     `whereEncrypted` and `orWhereEncrypted`
-* uses Laravel's Facades `Crypt` for encrypting and decrypting fields
+* uses openssl for encrypting and decrypting fields
 
 ## Requirements
 
