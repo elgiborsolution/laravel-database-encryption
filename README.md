@@ -7,7 +7,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/elgibor-solution/laravel-database-encryption.svg?style=flat-square)](https://packagist.org/packages/elgibor-solution/laravel-database-encryption)
 
 
-## Package for encrypting and decrypting model attributes for Laravel using Laravel's Crypt
+## Package for encrypting and decrypting model attributes for Laravel using openssl
 
 ## Key Features
 
