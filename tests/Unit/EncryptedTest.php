@@ -1,15 +1,18 @@
 <?php
+
 namespace ESolution\DBEncryption\Tests;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class EncryptedTest extends TestCase {
+class EncryptedTest extends TestCase
+{
 
     use RefreshDatabase;
 
     /**
-    * @test
-    */
+     * @test
+     */
     public function it_test_if_encryption_decoding_is_working()
     {
         $name = 'Jhon';
@@ -19,7 +22,6 @@ class EncryptedTest extends TestCase {
 
         $this->assertEquals($user->email, $email);
         $this->assertEquals($user->name, $name);
-
     }
 
     /**
@@ -39,8 +41,8 @@ class EncryptedTest extends TestCase {
 
 
     /**
-    * @test
-    */
+     * @test
+     */
     public function it_test_that_encrypt_model_commands_encrypt_existing_records()
     {
         TestUser::$enableEncryption = false;
@@ -58,8 +60,8 @@ class EncryptedTest extends TestCase {
 
 
     /**
-    * @test
-    */
+     * @test
+     */
     public function it_test_that_where_in_query_builder_is_working()
     {
         $email = 'example@email.com';
@@ -68,12 +70,11 @@ class EncryptedTest extends TestCase {
         $user = TestUser::whereEncrypted('email', '=', $email)->first();
 
         $this->assertNotNull($user);
-
     }
 
     /**
-    * @test
-    */
+     * @test
+     */
     public function it_assert_that_where_does_not_retrieve_a_user_with_incorrect_email()
     {
         $this->createUser();
@@ -93,7 +94,7 @@ class EncryptedTest extends TestCase {
 
         $this->createUser('Jhon Doe', $email);
 
-        $validator = validator(compact('email'), ['email'=>'exists_encrypted:test_users,email']);
+        $validator = validator(compact('email'), ['email' => 'exists_encrypted:test_users,email']);
 
         $this->assertFalse($validator->fails());
     }
@@ -106,8 +107,8 @@ class EncryptedTest extends TestCase {
         $this->createUser();
 
         $validator = validator(
-            ['email'=>'non_existing@email.com'],
-            ['email'=>'exists_encrypted:test_users,email']
+            ['email' => 'non_existing@email.com'],
+            ['email' => 'exists_encrypted:test_users,email']
         );
 
         $this->assertTrue($validator->fails());
@@ -123,7 +124,7 @@ class EncryptedTest extends TestCase {
 
         $this->createUser('Jhon Doe', $email);
 
-        $validator = validator(compact('email'), ['email'=>'unique_encrypted:test_users,email']);
+        $validator = validator(compact('email'), ['email' => 'unique_encrypted:test_users,email']);
 
         $this->assertTrue($validator->fails());
     }
@@ -136,11 +137,11 @@ class EncryptedTest extends TestCase {
         $this->createUser();
 
         $validator = validator(
-            ['email'=>'non_existing@email.com'],
-            ['email'=>'unique_encrypted:test_users,email']
+            ['email' => 'non_existing@email.com'],
+            ['email' => 'unique_encrypted:test_users,email']
         );
 
-        $this->assertFalse( $validator->fails() );
+        $this->assertFalse($validator->fails());
     }
 
     /**
@@ -148,17 +149,17 @@ class EncryptedTest extends TestCase {
      */
     public function it_tests_that_empty_values_are_encrypted()
     {
-        $user = $this->createUser(null,'example@email.com');
+        $user = $this->createUser(null, 'example@email.com');
         $raw = DB::table('test_users')->select('*')->first();
-        
+
         $this->assertNotEmpty($raw->name);
         $this->assertEmpty($user->name);
     }
 
 
     /**
-    * @test
-    */
+     * @test
+     */
     public function it_test_that_decrypt_command_is_working()
     {
         TestUser::$enableEncryption = false;
@@ -185,4 +186,16 @@ class EncryptedTest extends TestCase {
         $this->assertNotNull(TestUser::whereEncrypted('email', '=', 'JhOn@DoE.cOm')->first());
     }
 
+    /**
+     * @test
+     */
+    public function it_test_that_whereencrypted_can_handle_single_quote()
+    {
+        $email = "JhOn@DoE.cOm'";
+        $name = "Single's";
+        $this->createUser($name, $email);
+        $query = TestUser::whereEncrypted('email', $email)->orWhereEncrypted('name', $name)->first();
+
+        $this->assertNotNull($query);
+    }
 }
