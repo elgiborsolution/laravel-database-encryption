@@ -42,7 +42,7 @@ class DBEncryptionServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        
+
     }
 
 
@@ -52,14 +52,14 @@ class DBEncryptionServiceProvider extends ServiceProvider
         Validator::extend('unique_encrypted', function ($attribute, $value, $parameters, $validator) {
 
             // Initialize
-            $salt = substr(hash('sha256', env('APP_KEY')), 0, 16);
+            $salt = substr(hash('sha256', config('laravelDatabaseEncryption.encrypt_key')), 0, 16);
 
             $withFilter = count($parameters) > 3 ? true : false;
 
             $ignore_id = isset($parameters[2]) ? $parameters[2] : '';
 
             // Check using normal checker
-            $data = DB::table($parameters[0])->whereRaw("CONVERT(AES_DECRYPT(FROM_bASE64(`{$parameters[1]}`), '{$salt}') USING utf8mb4) = '{$value}' ");
+            $data = DB::table($parameters[0])->whereRaw("CONVERT(AES_DECRYPT(FROM_BASE64(`{$parameters[1]}`), '{$salt}') USING utf8mb4) = '{$value}' ");
             $data = $ignore_id != '' ? $data->where('id','!=',$ignore_id) : $data;
 
             if ($withFilter) {
@@ -76,7 +76,7 @@ class DBEncryptionServiceProvider extends ServiceProvider
         Validator::extend('exists_encrypted', function ($attribute, $value, $parameters, $validator) {
 
             // Initialize
-            $salt = substr(hash('sha256', env('APP_KEY')), 0, 16);
+            $salt = substr(hash('sha256', config('laravelDatabaseEncryption.encrypt_key')), 0, 16);
 
             $withFilter = count($parameters) > 3 ? true : false;
             if(!$withFilter){
@@ -84,9 +84,9 @@ class DBEncryptionServiceProvider extends ServiceProvider
             }else{
                 $ignore_id = isset($parameters[4]) ? $parameters[4] : '';
             }
-            
+
             // Check using normal checker
-            $data = DB::table($parameters[0])->whereRaw("CONVERT(AES_DECRYPT(FROM_bASE64(`{$parameters[1]}`), '{$salt}') USING utf8mb4) = '{$value}' ");
+            $data = DB::table($parameters[0])->whereRaw("CONVERT(AES_DECRYPT(FROM_BASE64(`{$parameters[1]}`), '{$salt}') USING utf8mb4) = '{$value}' ");
             $data = $ignore_id != '' ? $data->where('id','!=',$ignore_id) : $data;
 
             if ($withFilter) {
@@ -96,7 +96,7 @@ class DBEncryptionServiceProvider extends ServiceProvider
             if ($data->first()) {
                 return true;
             }
-            
+
             return false;
         });
     }
