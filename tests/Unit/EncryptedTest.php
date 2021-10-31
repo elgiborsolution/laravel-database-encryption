@@ -147,12 +147,12 @@ class EncryptedTest extends TestCase
     /**
      * @test
      */
-    public function it_tests_that_empty_values_are_encrypted()
+    public function it_tests_that_empty_values_are_not_encrypted()
     {
         $user = $this->createUser(null, 'example@email.com');
         $raw = DB::table('test_users')->select('*')->first();
 
-        $this->assertNotEmpty($raw->name);
+        $this->assertEmpty($raw->name);
         $this->assertEmpty($user->name);
     }
 

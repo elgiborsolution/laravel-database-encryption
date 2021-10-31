@@ -10,13 +10,19 @@ use ESolution\DBEncryption\Encrypter;
 
 trait EncryptedAttribute {
 
+    public static $enableEncryption = true;
+
+    function __construct() {
+      self::$enableEncryption = config('laravelDatabaseEncryption.enable_encryption');
+    }
+
      /**
      * @param $key
      * @return bool
      */
     public function isEncryptable($key)
     {
-        if(config('laravelDatabaseEncryption.enable_encryption')){
+        if(self::$enableEncryption){
             return in_array($key, $this->encryptable);
         }
 
