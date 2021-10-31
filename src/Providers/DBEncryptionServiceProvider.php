@@ -28,6 +28,11 @@ class DBEncryptionServiceProvider extends ServiceProvider
         $this->bootValidators();
 
         if ($this->app->runningInConsole()) {
+
+            $this->publishes([
+                __DIR__.'/../config/config.php' => config_path('laravelDatabaseEncryption.php'),
+            ], 'config');
+
             $this->commands([
                 EncryptModel::class,
                 DecryptModel::class
@@ -42,7 +47,7 @@ class DBEncryptionServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
+        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'laravelDatabaseEncryption');
     }
 
 
