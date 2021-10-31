@@ -10,17 +10,16 @@ use ESolution\DBEncryption\Encrypter;
 
 trait EncryptedAttribute {
 
-    public static $enableEncryption = true;
-
      /**
      * @param $key
      * @return bool
      */
     public function isEncryptable($key)
     {
-        if(self::$enableEncryption){
+        if(config('laravelDatabaseEncryption.enable_encryption')){
             return in_array($key, $this->encryptable);
         }
+
         return false;
     }
 
@@ -46,7 +45,7 @@ trait EncryptedAttribute {
 
     public function setAttribute($key, $value)
     {
-      if ($this->isEncryptable($key))
+      if ($this->isEncryptable($key) && (!is_null($value) && $value != ''))
       {
         try {
           $value = Encrypter::encrypt($value);
@@ -72,7 +71,7 @@ trait EncryptedAttribute {
         }
         return $attributes;
     }
-    
+
     // Extend EncryptionEloquentBuilder
     public function newEloquentBuilder($query)
     {
@@ -81,11 +80,11 @@ trait EncryptedAttribute {
 
     public function decryptAttribute($value)
     {
-       return $value ? Encrypter::decrypt($value) : '';
+       return (!is_null($value) && $value != '') ? Encrypter::decrypt($value) : $value;
     }
 
     public function encryptAttribute($value)
     {
-        return $value ? Encrypter::encrypt($value) : '';
+        return (!is_null($value) && $value != '') ? Encrypter::encrypt($value) : $value;
     }
 }
