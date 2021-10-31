@@ -78,11 +78,25 @@ trait EncryptedAttribute {
         return new EncryptionEloquentBuilder($query);
     }
 
+    /**
+     * Decrypt Attribute
+     *
+     * @param string $value
+     *
+     * @return string
+     */
     public function decryptAttribute($value)
     {
        return (!is_null($value) && $value != '') ? Encrypter::decrypt($value) : $value;
     }
 
+    /**
+     * Encrypt Attribute
+     *
+     * @param string $value
+     *
+     * @return string
+     */
     public function encryptAttribute($value)
     {
         return (!is_null($value) && $value != '') ? Encrypter::encrypt($value) : $value;
